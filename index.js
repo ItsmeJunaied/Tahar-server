@@ -67,7 +67,7 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
 
-    await client.connect();
+    // await client.connect();
 
     const UserData = client.db('TaharDB').collection('Users');
     const ProductData = client.db('TaharDB').collection('Products');
@@ -75,6 +75,7 @@ async function run() {
     const returnData = client.db('TaharDB').collection('Return');
     const categoryData = client.db('TaharDB').collection('Category');
     const fabricsData = client.db('TaharDB').collection('fabrics');
+    const CartData = client.db('TaharDB').collection('cart');
 
 
 
@@ -298,6 +299,46 @@ async function run() {
 
       res.json({ success: true, message: 'Fabrics type added successfully' });
     });
+
+    ////user cart get
+    app.get('/userCartData', async (req, res) => {
+      const result = await CartData.find().toArray();
+      res.send(result)
+    })
+    //user cart post
+    app.post('/userCartData', async (req, res) => {
+      const { customerEmail, customerName, ProductHeightQuantity, ProductName, ProductImage, ProductPrice, ProductSize, ProductQuantity } = req.body;
+
+      const result = await CartData.insertOne({
+        customerEmail,
+        customerName,
+        ProductName,
+        ProductPrice,
+        ProductImage,
+        ProductSize,
+        ProductQuantity,
+        ProductHeightQuantity
+      });
+      res.json({ success: true, message: 'Product added successfully' });
+    });
+
+    //update cart quantity
+    app.patch('/userCartData/:productId', async (req, res) => {
+      const productId = req.params.productId;
+      const filter = { _id: new ObjectId(productId) };
+      const newQuantity = req.body;
+      console.log(newQuantity);
+      const updateDoc = {
+        $set: {
+          ProductQuantity: newQuantity.ProductQuantity
+        }
+      }
+
+      const result = await CartData.updateOne(filter, updateDoc);
+      res.send(result);
+
+    });
+
 
     // await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
