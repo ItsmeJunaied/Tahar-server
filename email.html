@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Email Template</title>
+</head>
+<body style="font-family: Arial, Helvetica, sans-serif;">
+
+    <div class="email" style="max-width: 480px; margin: 1rem auto; border-radius: 10px; border-top: #d74034 2px solid; border-bottom: #d74034 2px solid; box-shadow: 0 2px 18px rgba(0, 0, 0, 0.2); padding: 1.5rem;">
+
+        <div class="email-head" style="border-bottom: 1px solid rgba(0, 0, 0, 0.2); padding-bottom: 1rem;">
+            <div class="head-img" style="max-width: 240px; padding: 0 0.5rem; display: block; margin: 0 auto;">
+                <img src="https://ibb.co/TKX5Dsm" alt="damnitrahul-logo" style="width: 100%;">
+            </div>
+        </div>
+
+        <div class="email-body">
+
+            <div class="body-text" style="padding: 2rem 0 1rem; text-align: center; font-size: 1.15rem;">
+                <div class="body-greeting" style="font-weight: bold; margin-bottom: 1rem;">Hi, {{customerName}}!</div>
+                {{orderMessage}}
+            </div>
+
+            <div class="invoice-icon" style="max-width: 80px; margin: 1rem auto;">
+                <img src="https://ibb.co/1fTnVM5" alt="invoice-icon" style="width: 100%;">
+            </div>
+
+            <div class="body-table" style="text-align: left;">
+                <table style="width: 100%; font-size: 1.1rem;">
+                    <tr class="item">
+                        <th>Product Name</th>
+                        <th>Quantity</th>
+                        <th>Size</th>
+                        <th>Price</th>
+                    </tr>
+                    {{productRows}}
+                    <tr class="total">
+                        <th>Total</th>
+                        <th>{{totalAmount}}</th>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="body-text bottom-text" style="padding: 2rem 0 1rem; text-align: center; font-size: 0.8rem;">
+                {{thankYouMessage}}
+            </div>
+
+        </div>
+
+        <div class="email-footer" style="border-top: 1px solid rgba(0, 0, 0, 0.2);">
+            <div class="footer-text" style="font-size: 0.8rem; text-align: center; padding-top: 1rem;">
+                &copy; <a href="{{websiteLink}}" target="_blank" style="color: #d74034;">{{websiteName}}</a>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="email-footer" style="font-size: 0.8rem; text-align: center;">
+        &copy; <a href="https://damnitrahul.com/" target="_blank" style="color: #d74034;">damnitrahul.com</a>
+    </div>
+
+</body>
+</html>

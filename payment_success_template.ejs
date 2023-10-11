@@ -1,0 +1,94 @@
+// Generate PDF invoice
+const invoiceData = {
+  // Customize enables you to provide your own templates
+  // Please review the documentation for instructions and examples
+  "customize": {
+    //  "template": fs.readFileSync('template.html', 'base64') // Must be base64 encoded html 
+  },
+  "images": {
+    // The logo on top of your invoice
+    "logo": "https://i.ibb.co/hsFc8KK/tahar-logo.png",
+    // The invoice background
+  },
+  // Your own data
+  "sender": {
+    "company": "Tahar",
+    "address": "Dhaka",
+    "zip": "1234 AB",
+    "city": "Dhaka Division",
+    "country": "Bangladesh"
+    //"custom1": "custom value 1",
+    //"custom2": "custom value 2",
+    //"custom3": "custom value 3"
+  },
+  // Your recipient
+  "client": {
+    "company": "Client Corp",
+    "address": "Clientstreet 456",
+    "zip": "4567 CD",
+    "city": "Clientcity",
+    "country": "Clientcountry"
+    // "custom1": "custom value 1",
+    // "custom2": "custom value 2",
+    // "custom3": "custom value 3"
+  },
+  "information": {
+    // Invoice number
+    "number": "2021.0001",
+    // Invoice data
+    "date": "12-12-2021",
+    // Invoice due date
+    "due-date": "31-12-2021"
+  },
+  // The products you would like to see on your invoice
+  // Total values are being calculated automatically
+  "products": [
+    {
+      "quantity": 2,
+      "description": "Product 1",
+      "tax-rate": 6,
+      "price": 33.87
+    },
+    {
+      "quantity": 4.1,
+      "description": "Product 2",
+      "tax-rate": 6,
+      "price": 12.34
+    },
+    {
+      "quantity": 4.5678,
+      "description": "Product 3",
+      "tax-rate": 21,
+      "price": 6324.453456
+    }
+  ],
+  // The message you would like to display on the bottom of your invoice
+  "bottom-notice": "Kindly pay your invoice within 15 days.",
+
+};
+
+easyinvoice.createInvoice(invoiceData, async function (result) {
+  try {
+    // Generate a unique filename (you might want to use a library for this)
+    const uniqueFilename = `invoice_${req.params.tranId}.pdf`;
+
+    // Define the file path where you want to save the PDF
+    const filePath = `./pdfs/${uniqueFilename}`;
+
+    // Write the PDF to disk
+    await fs.writeFileSync(filePath, result.pdf, 'base64');
+
+    // Now that the file is saved, you can save the file path to MongoDB
+    const savedPdf = await InvoiceCollection.insertOne({
+      tranjection_id: req.params.tranId,
+      filePath: filePath
+    });
+
+    console.log('PDF saved in MongoDB and InvoiceCollection:', savedPdf);
+
+    // ... rest of your code
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
