@@ -96,6 +96,7 @@ async function run() {
     const videoData = client.db('TaharDB').collection('video');
     const InvoiceCollection = client.db('TaharDB').collection('invoice');
     const CashOnDeliveryData = client.db('TaharDB').collection('COD');
+    const rating = client.db('TaharDB').collection('rating');
 
 
     app.get('/users', async (req, res) => {
@@ -149,6 +150,8 @@ async function run() {
     });
 
 
+
+
     app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
     // customarSpotlightData
@@ -176,6 +179,18 @@ async function run() {
     app.post('/return', async (req, res) => {
       const returnInfo = req.body;
       const result = await returnData.insertOne(returnInfo);
+      res.send(result);
+    })
+
+    //rating get data
+    app.get('/rating', async (req, res) => {
+      const result = await rating.find().toArray();
+      res.send(result);
+    })
+    // rating post
+    app.post('/rating', async (req, res) => {
+      const ratingInfo = req.body;
+      const result = await rating.insertOne(ratingInfo);
       res.send(result);
     })
 
@@ -505,21 +520,22 @@ async function run() {
 
     const tran_id = new ObjectId().toString();
     app.post('/orders', async (req, res) => {
-      console.log(req.body)
-      const { localCartData } = req.body;
 
-      console.log('Order Details:', localCartData);
+
+      const { localCartData } = req.body;
+      console.log(req.body);
+      // console.log('Order Details:', localCartData);
       if (localCartData && localCartData.length > 0) {
-        console.log('Order Details:', localCartData);
+        // console.log('Order Details:', localCartData);
         const product_names = localCartData.map(product => product.ProductName);
 
         const data = {
 
           total_amount: parseFloat(req.body?.subtotalTaxandShipping),
-          currency: 'BDT',
+          currency: req.body?.selectedCurrencyValue,
           tran_id: tran_id, // use unique tran_id for each api call
-          success_url: `https://tahar-server.vercel.app/payment/success/${tran_id}`,
-          fail_url: `https://tahar-server.vercel.app/payment/fail/${tran_id}`,
+          success_url: `http://localhost:5000/payment/success/${tran_id}`,
+          fail_url: `http://localhost:5000/payment/fail/${tran_id}`,
           cancel_url: 'http://localhost:3030/cancel',
           ipn_url: 'http://localhost:3030/ipn',
           shipping_method: req.body?.selectedOption,
@@ -543,6 +559,8 @@ async function run() {
           ship_state: req.body?.City,
           ship_postcode: req.body?.PostalCode,
           ship_country: req.body?.Country,
+          date: req.body?.currentDate,
+          discount: req.body?.discount
         }
 
         console.log(data)
@@ -631,95 +649,7 @@ async function run() {
             }
           });
 
-
-          // const productsData = order.localCartData.map(product => {
-          //   return {
-          //     "quantity": product.ProductQuantity,
-          //     "Size": product.ProductSize,
-          //     "description": product.ProductName,
-          //     "tax-rate": 5, // Add the appropriate tax rate here
-          //     "price": product.ProductPrice,
-          //   };
-          // });
-
-          // // Get current date
-          // const currentDate = new Date();
-
-          // Calculate expected or due date (7 days after current date)
-          // const dueDate = new Date(currentDate);
-          // dueDate.setDate(currentDate.getDate() + 7);
-
-          // // Format dates to dd-mm-yyyy
-          // const formatDate = (date) => {
-          //   const day = date.getDate().toString().padStart(2, '0');
-          //   const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Months are 0-based
-          //   const year = date.getFullYear();
-          //   return `${day}-${month}-${year}`;
-          // };
-
-          // const formattedCurrentDate = formatDate(currentDate);
-          // const formattedDueDate = formatDate(dueDate);
-
-          // const invoiceData = {
-          //   "customize": {},
-          //   "images": {
-          //     "logo": "https://i.ibb.co/hsFc8KK/tahar-logo.png",
-          //   },
-          //   "sender": {
-          //     "company": "Tahar",
-          //     "address": "Dhaka",
-          //     "zip": "1234 AB",
-          //     "city": "Dhaka Division",
-          //     "country": "Bangladesh"
-          //   },
-          //   "client": {
-          //     "company": order.data.cus_name,
-          //     "address": order.data.cus_address,
-          //     "zip": order.data.cus_postcode, // Add appropriate zip code here
-          //     "city": order.data.cus_city,
-          //     "country": order.data.cus_country
-          //   },
-          //   "information": {
-          //     "Invoice": `#${req.params.tranId}`,
-          //     "Transection ID": `#${req.params.tranId}`,
-          //     "date": formattedCurrentDate, // Add the actual order date here
-          //     "Expected-date": formattedDueDate // Add the actual due date here
-          //   },
-          //   "products": productsData,
-          //   "Subtotal": order.data.total_amount,
-          //   "Total": order.data.total_amount,
-          //   "bottom-notice": "Kindly pay your invoice within 15 days."
-          // };
-
-          // easyinvoice.createInvoice(invoiceData, async function (result) {
-          //   try {
-          //     // Generate a unique filename (you might want to use a library for this)
-          //     const uniqueFilename = `invoice_${req.params.tranId}.pdf`;
-
-          //     // Define the file path where you want to save the PDF
-          //     const filePath = `./pdfs/${uniqueFilename}`;
-
-          //     // Write the PDF to disk
-          //     await fs.writeFileSync(filePath, result.pdf, 'base64');
-
-          //     // Now that the file is saved, you can save the file path to MongoDB
-          //     const savedPdf = await InvoiceCollection.insertOne({
-          //       tranjection_id: req.params.tranId,
-          //       filePath: filePath
-          //     });
-
-          //     console.log('PDF saved in MongoDB and InvoiceCollection:', savedPdf);
-
-          //     // ... rest of your code
-          //   } catch (error) {
-          //     console.error(error);
-          //     res.status(500).send('Internal Server Error');
-          //   }
-          // });
-
-
-
-          res.redirect(`https://tahar-b34d7.web.app/payment/success/${req.params.tranId}`);
+          res.redirect(`http://localhost:5173/payment/success/${req.params.tranId}`);
         }
       } catch (error) {
         console.error(error);
@@ -735,40 +665,71 @@ async function run() {
     });
 
 
+    app.patch('/orders/:id', async (req, res) => {
+      try {
+        const id = req.params.id;
+
+        console.log(id)
+        const filter = { _id: new ObjectId(id) };
+        const updateStatus = req.body;
+
+        console.log(updateStatus)
+        // if (!updateStatus || !updateStatus.Confirm) {
+        //   return res.status(400).json({ error: 'Invalid request. Status is missing.' });
+        // }
+
+        const updateDoc = {
+          $set: {
+            Confirm: updateStatus.Confirm
+          }
+        }
+
+        const result = await OrderData.updateOne(filter, updateDoc);
+
+        if (result.matchedCount === 0) {
+          return res.status(404).json({ error: 'User not found.' });
+        }
+
+        res.json({ success: true, modifiedCount: result.modifiedCount });
+      } catch (error) {
+        console.error('Error:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+      }
+    });
     // payment fail
     app.post("/payment/fail/:tranId", async (req, res) => {
       // console.log(req.params.tranId)
       const result = await OrderData.deteteOne({ tranjection_id: req.params.tranId });
       if (result.deletedCount) {
-        res.redirect(`https://tahar-b34d7.web.app/payment/fail/${req.params.tranId}`)
+        res.redirect(`http://localhost:5173/payment/fail/${req.params.tranId}`)
       }
 
     })
 
-    // Define a route to get all invoices
-    app.get('/invoices', async (req, res) => {
+    // // Define a route to get all invoices
+    // app.get('/invoices', async (req, res) => {
 
-      // const invoices = await InvoiceCollection.find({});
-      const result = await InvoiceCollection.find().toArray();
-      res.send(result);
-    });
+    //   // const invoices = await InvoiceCollection.find({});
+    //   const result = await InvoiceCollection.find().toArray();
+    //   res.send(result);
+    // });
 
-    app.get('/downloadInvoice/:id', async (req, res) => {
-      try {
-        const id = req.params.id;
-        const invoice = await InvoiceCollection.findOne({ tranjection_id: id });
+    // app.get('/downloadInvoice/:id', async (req, res) => {
+    //   try {
+    //     const id = req.params.id;
+    //     const invoice = await InvoiceCollection.findOne({ tranjection_id: id });
 
-        if (!invoice) {
-          return res.status(404).send('Invoice not found');
-        }
+    //     if (!invoice) {
+    //       return res.status(404).send('Invoice not found');
+    //     }
 
-        const filePath = path.join(__dirname, invoice.filePath);
-        res.sendFile(filePath);
-      } catch (error) {
-        console.error(error);
-        res.status(500).send('Internal Server Error');
-      }
-    });
+    //     const filePath = path.join(__dirname, invoice.filePath);
+    //     res.sendFile(filePath);
+    //   } catch (error) {
+    //     console.error(error);
+    //     res.status(500).send('Internal Server Error');
+    //   }
+    // });
 
 
     // cash on delivery post
