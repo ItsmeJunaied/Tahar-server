@@ -534,8 +534,8 @@ async function run() {
           total_amount: parseFloat(req.body?.subtotalTaxandShipping),
           currency: req.body?.selectedCurrencyValue,
           tran_id: tran_id, // use unique tran_id for each api call
-          success_url: `https://tahar-server.vercel.app/payment/success/${tran_id}`,
-          fail_url: `https://tahar-server.vercel.app/payment/fail/${tran_id}`,
+          success_url: `http://localhost:5000/payment/success/${tran_id}`,
+          fail_url: `http://localhost:5000/payment/fail/${tran_id}`,
           cancel_url: 'http://localhost:3030/cancel',
           ipn_url: 'http://localhost:3030/ipn',
           shipping_method: req.body?.selectedOption,
@@ -649,7 +649,7 @@ async function run() {
             }
           });
 
-          res.redirect(`https://tahar-b34d7.web.app/payment/success/${req.params.tranId}`);
+          res.redirect(`http://localhost:5173/payment/success/${req.params.tranId}`);
         }
       } catch (error) {
         console.error(error);
