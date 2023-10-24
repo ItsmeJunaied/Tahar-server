@@ -533,7 +533,7 @@ async function run() {
 
           total_amount: parseFloat(req.body?.subtotalTaxandShipping),
           currency: req.body?.selectedCurrencyValue,
-          tran_id: tran_id, // use unique tran_id for each api cal
+          tran_id: tran_id, // use unique tran_id for each api ca
           success_url: `http://localhost:5000/payment/success/${tran_id}`,
           fail_url: `http://localhost:5000/payment/fail/${tran_id}`,
           cancel_url: 'http://localhost:3030/cancel',
