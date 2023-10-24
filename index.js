@@ -518,193 +518,193 @@ async function run() {
 
     // await client.db("admin").command({ ping: 1 });
 
-    const tran_id = new ObjectId().toString();
-    app.post('/orders', async (req, res) => {
+    // const tran_id = new ObjectId().toString();
+    // app.post('/orders', async (req, res) => {
 
 
-      const { localCartData } = req.body;
-      console.log(req.body);
-      // console.log('Order Details:', localCartData);
-      if (localCartData && localCartData.length > 0) {
-        // console.log('Order Details:', localCartData);
-        const product_names = localCartData.map(product => product.ProductName);
+    //   const { localCartData } = req.body;
+    //   console.log(req.body);
+    //   // console.log('Order Details:', localCartData);
+    //   if (localCartData && localCartData.length > 0) {
+    //     // console.log('Order Details:', localCartData);
+    //     const product_names = localCartData.map(product => product.ProductName);
 
-        const data = {
+    //     const data = {
 
-          total_amount: parseFloat(req.body?.subtotalTaxandShipping),
-          currency: req.body?.selectedCurrencyValue,
-          tran_id: tran_id, // use unique tran_id for each api call
-          success_url: `http://localhost:5000/payment/success/${tran_id}`,
-          fail_url: `http://localhost:5000/payment/fail/${tran_id}`,
-          cancel_url: 'http://localhost:3030/cancel',
-          ipn_url: 'http://localhost:3030/ipn',
-          shipping_method: req.body?.selectedOption,
-          product_name: product_names.join(', '),
-          product_category: 'ALL',
-          product_profile: 'general',
-          cus_name: req.body?.FirstName,
-          cus_email: req.body?.email,
-          cus_add1: req.body?.Address,
-          cus_add2: req.body?.Address,
-          cus_city: req.body?.City,
-          cus_state: req.body?.City,
-          cus_postcode: req.body?.PostalCode,
-          cus_country: req.body?.Country,
-          cus_phone: req.body?.number,
-          cus_fax: req.body?.number,
-          ship_name: req.body?.FirstName,
-          ship_add1: req.body?.Address,
-          ship_add2: req.body?.Address,
-          ship_city: req.body?.City,
-          ship_state: req.body?.City,
-          ship_postcode: req.body?.PostalCode,
-          ship_country: req.body?.Country,
-          date: req.body?.currentDate,
-          discount: req.body?.discount
-        }
+    //       total_amount: parseFloat(req.body?.subtotalTaxandShipping),
+    //       currency: req.body?.selectedCurrencyValue,
+    //       tran_id: tran_id, // use unique tran_id for each api call
+    //       success_url: `http://localhost:5000/payment/success/${tran_id}`,
+    //       fail_url: `http://localhost:5000/payment/fail/${tran_id}`,
+    //       cancel_url: 'http://localhost:3030/cancel',
+    //       ipn_url: 'http://localhost:3030/ipn',
+    //       shipping_method: req.body?.selectedOption,
+    //       product_name: product_names.join(', '),
+    //       product_category: 'ALL',
+    //       product_profile: 'general',
+    //       cus_name: req.body?.FirstName,
+    //       cus_email: req.body?.email,
+    //       cus_add1: req.body?.Address,
+    //       cus_add2: req.body?.Address,
+    //       cus_city: req.body?.City,
+    //       cus_state: req.body?.City,
+    //       cus_postcode: req.body?.PostalCode,
+    //       cus_country: req.body?.Country,
+    //       cus_phone: req.body?.number,
+    //       cus_fax: req.body?.number,
+    //       ship_name: req.body?.FirstName,
+    //       ship_add1: req.body?.Address,
+    //       ship_add2: req.body?.Address,
+    //       ship_city: req.body?.City,
+    //       ship_state: req.body?.City,
+    //       ship_postcode: req.body?.PostalCode,
+    //       ship_country: req.body?.Country,
+    //       date: req.body?.currentDate,
+    //       discount: req.body?.discount
+    //     }
 
-        console.log(data)
+    //     console.log(data)
 
-        const sslcz = new SSLCommerzPayment(store_id, store_passwd, is_live)
-        sslcz.init(data).then(apiResponse => {
-          // Redirect the user to payment gateway
-          let GatewayPageURL = apiResponse.GatewayPageURL
-          res.send({ GatewayPageURL })
-          console.log('Redirecting to: ', GatewayPageURL)
-        });
+    //     const sslcz = new SSLCommerzPayment(store_id, store_passwd, is_live)
+    //     sslcz.init(data).then(apiResponse => {
+    //       // Redirect the user to payment gateway
+    //       let GatewayPageURL = apiResponse.GatewayPageURL
+    //       res.send({ GatewayPageURL })
+    //       console.log('Redirecting to: ', GatewayPageURL)
+    //     });
 
-        const finalOrder = {
-          localCartData,
-          paidStatus: false,
-          tranjection_id: tran_id,
-          Confirm: 'Processing',
-          data: data
-        }
+    //     const finalOrder = {
+    //       localCartData,
+    //       paidStatus: false,
+    //       tranjection_id: tran_id,
+    //       Confirm: 'Processing',
+    //       data: data
+    //     }
 
-        const result = OrderData.insertOne(finalOrder);
-      };
-    })
+    //     const result = OrderData.insertOne(finalOrder);
+    //   };
+    // })
 
-    // payment success
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: 'sharpx225@gmail.com',
-        pass: 'twyogsikwxupbzdf'
-      }
-    });
+    // // payment success
+    // const transporter = nodemailer.createTransport({
+    //   service: 'gmail',
+    //   auth: {
+    //     user: 'sharpx225@gmail.com',
+    //     pass: 'twyogsikwxupbzdf'
+    //   }
+    // });
 
-    // Update your payment success route
-    app.post("/payment/success/:tranId", async (req, res) => {
-      // console.log(req.params.tranId);
-      try {
-        console.log(req.params.tranId);
-        const result = await OrderData.updateOne(
-          { tranjection_id: req.params.tranId },
-          {
-            $set: {
-              paidStatus: true
-            }
-          }
-        );
-        console.log(result);
-        console.log(result.modifiedCount)
-        if (result.modifiedCount > 0) {
+    // // Update your payment success route
+    // app.post("/payment/success/:tranId", async (req, res) => {
+    //   // console.log(req.params.tranId);
+    //   try {
+    //     console.log(req.params.tranId);
+    //     const result = await OrderData.updateOne(
+    //       { tranjection_id: req.params.tranId },
+    //       {
+    //         $set: {
+    //           paidStatus: true
+    //         }
+    //       }
+    //     );
+    //     console.log(result);
+    //     console.log(result.modifiedCount)
+    //     if (result.modifiedCount > 0) {
 
-          const order = await OrderData.findOne({ tranjection_id: req.params.tranId });
-          console.log(order);
-          const recipientEmail = order.data.cus_email;
+    //       const order = await OrderData.findOne({ tranjection_id: req.params.tranId });
+    //       console.log(order);
+    //       const recipientEmail = order.data.cus_email;
 
-          const emailTemplate = fs.readFileSync('./email.html', 'utf8');
+    //       const emailTemplate = fs.readFileSync('./email.html', 'utf8');
 
-          // Replace placeholders in the email template
-          const emailBody = emailTemplate
-            .replace('{{customerName}}', order.data.cus_name)
-            .replace('{{orderMessage}}', 'Your order has been successfully completed and delivered to you!')
-            .replace('{{productRows}}', order.localCartData.map(product => `
-            <tr>
-              <td>${product.ProductName}</td>
-              <td>${product.ProductQuantity}</td>
-              <td>${product.ProductSize}</td>
-              <td>${product.ProductPrice}</td>
-            </tr>
-          `).join(''))
-            .replace('{{totalAmount}}', order.data.total_amount)
-            .replace('{{thankYouMessage}}', 'Thank you for your order!')
-            .replace('{{websiteLink}}', 'https://damnitrahul.com/')
-            .replace('{{websiteName}}', 'damnitrahul.com');
+    //       // Replace placeholders in the email template
+    //       const emailBody = emailTemplate
+    //         .replace('{{customerName}}', order.data.cus_name)
+    //         .replace('{{orderMessage}}', 'Your order has been successfully completed and delivered to you!')
+    //         .replace('{{productRows}}', order.localCartData.map(product => `
+    //         <tr>
+    //           <td>${product.ProductName}</td>
+    //           <td>${product.ProductQuantity}</td>
+    //           <td>${product.ProductSize}</td>
+    //           <td>${product.ProductPrice}</td>
+    //         </tr>
+    //       `).join(''))
+    //         .replace('{{totalAmount}}', order.data.total_amount)
+    //         .replace('{{thankYouMessage}}', 'Thank you for your order!')
+    //         .replace('{{websiteLink}}', 'https://damnitrahul.com/')
+    //         .replace('{{websiteName}}', 'damnitrahul.com');
 
-          const mailOptions = {
-            from: 'sharpx225@gmail.com',
-            to: recipientEmail,
-            subject: 'Tahar Payment Successful',
-            html: emailBody
-          };
+    //       const mailOptions = {
+    //         from: 'sharpx225@gmail.com',
+    //         to: recipientEmail,
+    //         subject: 'Tahar Payment Successful',
+    //         html: emailBody
+    //       };
 
-          transporter.sendMail(mailOptions, function (error, info) {
-            if (error) {
-              console.error(error);
-            } else {
-              console.log('Email sent: ' + info.response);
-            }
-          });
+    //       transporter.sendMail(mailOptions, function (error, info) {
+    //         if (error) {
+    //           console.error(error);
+    //         } else {
+    //           console.log('Email sent: ' + info.response);
+    //         }
+    //       });
 
-          res.redirect(`http://localhost:5173/payment/success/${req.params.tranId}`);
-        }
-      } catch (error) {
-        console.error(error);
-        // Handle the error in an appropriate way, e.g., send an error response to the client
-        res.status(500).send('Internal Server Error');
-      }
-    });
+    //       res.redirect(`http://localhost:5173/payment/success/${req.params.tranId}`);
+    //     }
+    //   } catch (error) {
+    //     console.error(error);
+    //     // Handle the error in an appropriate way, e.g., send an error response to the client
+    //     res.status(500).send('Internal Server Error');
+    //   }
+    // });
 
-    //get succesful orders
-    app.get('/orders', async (req, res) => {
-      const result = await OrderData.find().toArray();
-      res.send(result);
-    });
+    // //get succesful orders
+    // app.get('/orders', async (req, res) => {
+    //   const result = await OrderData.find().toArray();
+    //   res.send(result);
+    // });
 
 
-    app.patch('/orders/:id', async (req, res) => {
-      try {
-        const id = req.params.id;
+    // app.patch('/orders/:id', async (req, res) => {
+    //   try {
+    //     const id = req.params.id;
 
-        console.log(id)
-        const filter = { _id: new ObjectId(id) };
-        const updateStatus = req.body;
+    //     console.log(id)
+    //     const filter = { _id: new ObjectId(id) };
+    //     const updateStatus = req.body;
 
-        console.log(updateStatus)
-        // if (!updateStatus || !updateStatus.Confirm) {
-        //   return res.status(400).json({ error: 'Invalid request. Status is missing.' });
-        // }
+    //     console.log(updateStatus)
+    //     // if (!updateStatus || !updateStatus.Confirm) {
+    //     //   return res.status(400).json({ error: 'Invalid request. Status is missing.' });
+    //     // }
 
-        const updateDoc = {
-          $set: {
-            Confirm: updateStatus.Confirm
-          }
-        }
+    //     const updateDoc = {
+    //       $set: {
+    //         Confirm: updateStatus.Confirm
+    //       }
+    //     }
 
-        const result = await OrderData.updateOne(filter, updateDoc);
+    //     const result = await OrderData.updateOne(filter, updateDoc);
 
-        if (result.matchedCount === 0) {
-          return res.status(404).json({ error: 'User not found.' });
-        }
+    //     if (result.matchedCount === 0) {
+    //       return res.status(404).json({ error: 'User not found.' });
+    //     }
 
-        res.json({ success: true, modifiedCount: result.modifiedCount });
-      } catch (error) {
-        console.error('Error:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
-      }
-    });
-    // payment fail
-    app.post("/payment/fail/:tranId", async (req, res) => {
-      // console.log(req.params.tranId)
-      const result = await OrderData.deteteOne({ tranjection_id: req.params.tranId });
-      if (result.deletedCount) {
-        res.redirect(`http://localhost:5173/payment/fail/${req.params.tranId}`)
-      }
+    //     res.json({ success: true, modifiedCount: result.modifiedCount });
+    //   } catch (error) {
+    //     console.error('Error:', error);
+    //     res.status(500).json({ error: 'Internal Server Error' });
+    //   }
+    // });
+    // // payment fail
+    // app.post("/payment/fail/:tranId", async (req, res) => {
+    //   // console.log(req.params.tranId)
+    //   const result = await OrderData.deteteOne({ tranjection_id: req.params.tranId });
+    //   if (result.deletedCount) {
+    //     res.redirect(`http://localhost:5173/payment/fail/${req.params.tranId}`)
+    //   }
 
-    })
+    // })
 
 
 
