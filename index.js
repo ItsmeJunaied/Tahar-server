@@ -94,7 +94,7 @@ async function run() {
     const OrderData = client.db('TaharDB').collection('order');
     const PromocodeData = client.db('TaharDB').collection('promo');
     const videoData = client.db('TaharDB').collection('video');
-    const InvoiceCollection = client.db('TaharDB').collection('invoice');
+    const subscribedEmails = client.db('TaharDB').collection('subscribedEmails');
     const CashOnDeliveryData = client.db('TaharDB').collection('COD');
     const rating = client.db('TaharDB').collection('rating');
 
@@ -270,13 +270,6 @@ async function run() {
         const UploaderRole = req.body.UploaderRole;
         const Date = req.body.Date;
 
-        const Scolor = req.body.Scolor;
-        const Mcolor = req.body.Mcolor;
-        const Lcolor = req.body.Lcolor;
-        const XLcolor = req.body.XLcolor;
-        const XXLcolor = req.body.XXLcolor;
-        const XXXLcolor = req.body.XXXLcolor;
-
         const Squantity = req.body.Squantity;
         const Mquantity = req.body.Mquantity;
         const Lquantity = req.body.Lquantity;
@@ -303,14 +296,7 @@ async function run() {
           UploaderRole,
           description,
           Date,
-
-          Scolor,
-          Mcolor,
-          Lcolor,
-          XLcolor,
-          XXLcolor,
-          XXXLcolor,
-
+          selectedColor,
           Squantity,
           Mquantity,
           Lquantity,
@@ -476,47 +462,7 @@ async function run() {
       res.json({ success: true, message: 'Fabrics type added successfully' });
     });
 
-    ////user cart get
-    // app.get('/userCartData', async (req, res) => {
-    //   const result = await CartData.find().toArray();
-    //   res.send(result)
-    // })
-    //user cart post
-    // app.post('/userCartData', async (req, res) => {
-    //   const { customerEmail, customerName, ProductHeightQuantity, ProductName, ProductImage, ProductPrice, ProductSize, ProductQuantity } = req.body;
 
-    //   const result = await CartData.insertOne({
-    //     customerEmail,
-    //     customerName,
-    //     ProductName,
-    //     ProductPrice,
-    //     ProductImage,
-    //     ProductSize,
-    //     ProductQuantity,
-    //     ProductHeightQuantity
-    //   });
-    //   res.json({ success: true, message: 'Product added successfully' });
-    // });
-
-    //update cart quantity
-    // app.patch('/userCartData/:productId', async (req, res) => {
-    //   const productId = req.params.productId;
-    //   const filter = { _id: new ObjectId(productId) };
-    //   const newQuantity = req.body;
-    //   console.log(newQuantity);
-    //   const updateDoc = {
-    //     $set: {
-    //       ProductQuantity: newQuantity.ProductQuantity
-    //     }
-    //   }
-
-    //   const result = await CartData.updateOne(filter, updateDoc);
-    //   res.send(result);
-
-    // });
-
-
-    // await client.db("admin").command({ ping: 1 });
 
     const tran_id = new ObjectId().toString();
     app.post('/orders', async (req, res) => {
@@ -738,6 +684,17 @@ async function run() {
 
     })
 
+    //newsletter
+    app.post('/newsletter', async (req, res) => {
+      const { email } = req.body;
+      const result = await subscribedEmails.insertOne({ email });
+      res.send(result);
+    });
+
+    // GET endpoint to retrieve all subscribed emails
+    app.get('/newsletter', (req, res) => {
+      return res.json({ emails: subscribedEmails });
+    });
 
 
 
